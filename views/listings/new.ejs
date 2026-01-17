@@ -1,27 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Listing</title>
-</head>
-<body>
-    <form method="POST" action="/listings">
-        <div>
-            Title: <input name="listing[title]" placeholder="" type="text" required>
-            <br><br>
-            Description: <textarea name="listing[description]" placeholder="" type="text" required></textarea>
-            <br> <br>
-            Image: <input name="listing[image]" placeholder="" type="text" required>
-            <br> <br>
-            Price: <input name="listing[price]" placeholder="" type="text" required>
-            <br> <br>
-            Location: <input name="listing[location]" placeholder="" type="text" required>
-            <br> <br>
-            Country: <input name="listing[country]" placeholder="" type="text" required>
-            <br> <br>
-            <button>Create</button>
-        </div>
-    </form>
-</body>
-</html>
+<% layout("layouts/boilerplate.ejs") %>
+
+<div class="row mt-2">
+    <div class="col-8 offset-2">
+        <h3>Create a New Listing</h3>
+        <form method="POST" action="/listings" class="new-listing-form">
+                    <div class="mb-3 form-lable">
+                        <label>Title</label>
+                        <input class="form-control" name="listing[title]" type="text" required>
+                    </div>
+
+                    <div class="mb-3 form-lable">
+                        <label>Description</label>
+                        <textarea class="form-control" name="listing[description]" type="text" required> </textarea>
+                    </div>
+                    
+                    <div class="mb-3 form-lable">
+                        <label for="image">Image</label>
+                        <input class="form-control" name="listing[image]" type="text" >
+                    </div>
+
+                    <div class="row">
+                        <div class="mb-3 form-lable col-md-4">
+                            <label for="">Price</label>
+                            <input class="form-control" name="listing[price]" type="number" required>
+                        </div>
+                    
+                        <div class="mb-3 form-lable col-md-4">
+                            <label for="">Location</label>
+                            <input class="form-control" name="listing[location]" type="text" required>
+                        </div>
+                    </div>
+                
+                    <div class="mb-3 form-lable">
+                        <label for="">Country</label>
+                        <input class="form-control" name="listing[country]" type="text" required>
+                    </div>
+
+                    <button class="btn btn-primary">Add Listing</button>
+                    <br> <br>
+        </form>
+    </div>
+</div>
+        

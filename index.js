@@ -4,6 +4,7 @@ import Listing from "./models/listing.js";
 import methodOverride from "method-override";
 import { fileURLToPath } from "url";
 import path from "path";
+import ejsMate from "ejs-mate";
 
 const app = express();
 const port = 8080;
@@ -11,9 +12,10 @@ const port = 8080;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+app.engine("ejs", ejsMate);
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
 
@@ -31,6 +33,10 @@ mongoose.connect("mongodb://127.0.0.1:27017/wanderlust")
 //     country: "India"
 // });
 // await list1.save();
+
+app.get("/", (req, res) => {
+    res.send("I am root!");
+});
 
 //show all listings
 app.get("/listings", async(req, res) => {
