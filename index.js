@@ -5,6 +5,10 @@ import methodOverride from "method-override";
 import { fileURLToPath } from "url";
 import path from "path";
 import ejsMate from "ejs-mate";
+import wrapAsync from "./utils/wrapAsync.js";
+import ExpressError from "./utils/ExpressError.js";
+import {listingSchema,reviewSchema} from "./schema.js";
+import Review from "./models/reviews.js";
 
 const app = express();
 const port = 8080;
@@ -35,57 +39,136 @@ mongoose.connect("mongodb://127.0.0.1:27017/wanderlust")
 // await list1.save();
 
 app.get("/", (req, res) => {
-    res.send("I am root!");
+    res.redirect("/listings");
 });
 
 //show all listings
-app.get("/listings", async(req, res) => {
+app.get(
+    "/listings", 
+    wrapAsync( async(req, res) => {
     const lists = await Listing.find();
     res.render("listings/index", {lists});
-});
+}));
 
 //create new listing (render form)
 app.get("/listings/new", (req, res) => {
     res.render("listings/new");
 });
 
+const validateListing = (req, res, next) => {
+    let {error} = listingSchema.validate(req.body);
+    if(error) {
+        let errMsg = error.details.map((el) => el.message).join(",");
+        throw new ExpressError(400, errMsg);
+    } else {
+        next();
+    }
+}
+
+const validateReview = (req, res, next) => {
+    let {error} = reviewSchema.validate(req.body);
+    if(error) {
+        let errMsg = error.details.map((el) => el.message).join(",");
+        throw new ExpressError(400, errMsg);
+    } else {
+        next();
+    }
+}
+
 //add new listing to db
-app.post("/listings", async (req, res) => {
-    // const {title, description, image, price, location, country} = req.body; or
-    const newListing = new Listing(req.body.listing)    
+app.post(
+  "/listings", 
+  validateListing,
+  wrapAsync(async (req, res, next) => {
+    const newListing = new Listing(req.body.listing);
     await newListing.save();
     res.redirect("/listings");
-});
+  })
+);
+
 
 //show listing details
-app.get("/listings/:id", async(req, res) => {
+app.get(
+    "/listings/:id", 
+    wrapAsync( async(req, res) => {
     const {id} = req.params;
-    const listing = await Listing.findById(id);
+    const listing = await Listing.findById(id).populate("reviews");
     res.render("listings/show", {
         listing, 
         formatPrice: (p) => p.toLocaleString("en-IN")});
-});
+}));
 
 //update listing(render form)
-app.get("/listings/:id/edit", async(req, res) => {
+app.get(
+    "/listings/:id/edit", 
+    wrapAsync( async(req, res) => {
     const {id} = req.params;
     const listing = await Listing.findById(id);
     res.render("listings/edit", {listing});
-});
+}));
 
 //update listing
-app.put("/listings/:id", async (req, res) => {
+app.put(
+    "/listings/:id", 
+    validateListing,
+    wrapAsync( async (req, res) => {
+
     const {id} = req.params;
     await Listing.findByIdAndUpdate(id, {...req.body.listing});
     res.redirect(`/listings/${id}`);
-});
+}));
 
 //delete listing
-app.delete("/listings/:id", async (req, res) => {
+app.delete(
+    "/listings/:id", 
+    wrapAsync( async (req, res) => {
     const {id} = req.params;
     await Listing.findByIdAndDelete(id);
     res.redirect("/listings");
+}));
+
+
+//add review
+app.post(
+    "/listings/:id/reviews",
+    validateReview,
+    wrapAsync(async (req, res) => {
+    let listing = await Listing.findById(req.params.id);
+    let newReview = new Review(req.body.review);
+
+    await newReview.save();
+    listing.reviews.push(newReview);
+    await listing.save();
+
+    res.redirect(`/listings/${listing._id}`);
+}));
+
+//delete reviews route
+app.delete("/listings/:id/reviews/:reviewId", async (req, res, next) => {
+  const { id, reviewId } = req.params;
+
+  // Remove review reference from listing
+  await Listing.findByIdAndUpdate(id, {
+    $pull: { reviews: reviewId }
+  });
+
+  // Delete review document
+  await Review.findByIdAndDelete(reviewId);
+
+  res.redirect(`/listings/${id}`);
 });
+
+app.all(/.*/, (req, res, next) => {
+  next(new ExpressError(404, "Page Not Found"));
+});
+
+
+//custom error handler
+app.use((err, req, res, next) => {
+    let {statusCode = 500, message = "Something went wrong!"} = err;
+    // res.status(statusCode).send(message);
+    res.status(statusCode).render("listings/error", {message});
+})
 
 app.listen(port, () => {
     console.log(`app is listening on ${port}`);

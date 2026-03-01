@@ -3,15 +3,21 @@
 <div class="row mt-2">
     <div class="col-8 offset-2">
         <h3>Create a New Listing</h3>
-        <form method="POST" action="/listings" class="new-listing-form">
+        <form method="POST" action="/listings" class="new-listing-form needs-validation" novalidate>
                     <div class="mb-3 form-lable">
                         <label>Title</label>
-                        <input class="form-control" name="listing[title]" type="text" required>
+                        <input class="form-control" name="listing[title]" type="text" id="validationCustom02" required>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
                     </div>
 
                     <div class="mb-3 form-lable">
                         <label>Description</label>
-                        <textarea class="form-control" name="listing[description]" type="text" required> </textarea>
+                        <textarea class="form-control" name="listing[description]" type="text" id="validationCustom02" required></textarea>
+                        <div class="invalid-feedback">
+                            Description required!
+                        </div>
                     </div>
                     
                     <div class="mb-3 form-lable">
@@ -22,18 +28,27 @@
                     <div class="row">
                         <div class="mb-3 form-lable col-md-4">
                             <label for="">Price</label>
-                            <input class="form-control" name="listing[price]" type="number" required>
+                            <input class="form-control" name="listing[price]" id="validationCustom02" required>
+                            <div class="invalid-feedback">
+                                Enter Price!
+                            </div>
                         </div>
                     
                         <div class="mb-3 form-lable col-md-4">
                             <label for="">Location</label>
-                            <input class="form-control" name="listing[location]" type="text" required>
+                            <input class="form-control" name="listing[location]" type="text" id="validationCustom02" required>
+                            <div class="invalid-feedback">
+                                Please provide a valid location.
+                            </div>
                         </div>
                     </div>
                 
                     <div class="mb-3 form-lable">
                         <label for="">Country</label>
-                        <input class="form-control" name="listing[country]" type="text" required>
+                        <input class="form-control" name="listing[country]" type="text" id="validationCustom03" required>
+                        <div class="invalid-feedback">
+                            Please provide a valid country.
+                        </div>
                     </div>
 
                     <button class="btn btn-primary">Add Listing</button>

@@ -23,7 +23,7 @@
   <div class="row">
     <div class="col-lg-8 offset-lg-2">
 
-      <h3 class="mb-3">Listing Details</h3>
+      <!-- <h3 class="mb-3">Listing Details</h3> -->
 
       <div class="card shadow-sm">
         <div class="card-body">
@@ -66,6 +66,97 @@
             >
               <button class="btn btn-danger">Delete</button>
             </form>
+          </div>
+
+            <div>
+              <hr class="my-4">
+              <h4 class="mb-3">Leave a Review</h4>
+
+              <form 
+                action="/listings/<%= listing._id %>/reviews" 
+                method="POST"
+                novalidate
+                class="mb-4 needs-validation"
+              >
+
+                <div class="mb-3">
+                  <label for="rating" class="form-label">Rating</label>
+                  <select name="review[rating]" id="rating" class="form-select" required>
+                    <option value="">Select Rating</option>
+                    <option value="1">1 - Poor</option>
+                    <option value="2">2 - Fair</option>
+                    <option value="3">3 - Good</option>
+                    <option value="4">4 - Very Good</option>
+                    <option value="5">5 - Excellent</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="comment" class="form-label">Comment</label>
+                  <textarea 
+                    name="review[comment]" 
+                    id="comment" 
+                    rows="3" 
+                    class="form-control"
+                    placeholder="Write your review..."
+                    required
+                  ></textarea>
+                  <div class="invalid-feedback">
+                          Please add comments!
+                    </div>
+                </div>
+
+                <div class="text-center mb-3">
+                  <button type="submit" class="btn btn-success">
+                    Submit Review
+                  </button>
+                </div>
+
+              </form>
+              
+              <div>
+                <hr class="my-4">
+
+                <h4 class="mb-3">All Reviews</h4>
+
+                <% if (listing.reviews.length === 0) { %>
+                  <p class="text-muted">No reviews yet.</p>
+                <% } %>
+
+                <div class="row">
+                  <% for (let review of listing.reviews) { %>
+                    <div class="col-md-6 mb-3">
+                      <div class="card shadow-sm">
+                        <div class="card-body">
+                          
+                          <h6>
+                            <%= "⭐".repeat(review.rating) %>
+                          </h6>
+
+                          <p class="card-text">
+                            <%= review.comment %>
+                          </p>
+
+                          <small class="text-muted">
+                            <%= review.createdAt ? review.createdAt.toDateString() : "" %>
+                          </small>
+
+                          <form 
+                            action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE"
+                            method="POST"
+                          >
+                            <button class="btn btn-sm btn-outline-danger mt-2">
+                              Delete
+                            </button>
+                          </form>
+
+                        </div>
+                      </div>
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+        
           </div>
 
         </div>
