@@ -2,28 +2,20 @@ import express from "express";
 import Listing from "../models/listing.js";
 import Review from "../models/reviews.js";
 import wrapAsync from "../utils/wrapAsync.js";
-import {listingSchema,reviewSchema} from "../schema.js";
-import ExpressError from "../utils/ExpressError.js";
+import { isLoggedIn, validateReview, isReviewAuthor, saveRedirectUrl } from "../middleware.js";
 
 const router = express.Router({mergeParams: true});
-
-const validateReview = (req, res, next) => {
-    let {error} = reviewSchema.validate(req.body);
-    if(error) {
-        let errMsg = error.details.map((el) => el.message).join(",");
-        throw new ExpressError(400, errMsg);
-    } else {
-        next();
-    }
-}
 
 //add review
 router.post(
     "/",
+    isLoggedIn,
     validateReview,
     wrapAsync(async (req, res) => {
     let listing = await Listing.findById(req.params.id);
     let newReview = new Review(req.body.review);
+
+    newReview.author = req.user._id; // connect user to review
 
     await newReview.save();
     listing.reviews.push(newReview);
@@ -35,20 +27,23 @@ router.post(
 }));
 
 //delete reviews route
-router.delete("/:reviewId", async (req, res, next) => {
-  const { id, reviewId } = req.params;
+router.delete("/:reviewId", 
+    isLoggedIn,
+    isReviewAuthor,
+    async (req, res, next) => {
+    const { id, reviewId } = req.params;
 
-  // Remove review reference from listing
-  await Listing.findByIdAndUpdate(id, {
-    $pull: { reviews: reviewId }
-  });
+    // Remove review reference from listing
+    await Listing.findByIdAndUpdate(id, {
+        $pull: { reviews: reviewId }
+    });
 
-  // Delete review document
-  await Review.findByIdAndDelete(reviewId);
+    // Delete review document
+    await Review.findByIdAndDelete(reviewId);
 
-  req.flash("success", "Review deleted successfully!");
+    req.flash("success", "Review deleted successfully!");
 
-  res.redirect(`/listings/${id}`);
+    res.redirect(`/listings/${id}`);
 });
 
 export default router;

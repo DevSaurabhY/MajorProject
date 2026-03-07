@@ -62,6 +62,10 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
   res.locals.success = req.flash("success"); // res.locals are accesible in ejs template
   res.locals.error = req.flash("error");
+  res.locals.currUser = req.user;
+
+  res.locals.redirectUrl = req.session.redirectUrl;
+
   next();
 });
 
