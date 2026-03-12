@@ -1,6 +1,6 @@
-# Wanderlust 🌍
+# Property-Listing-Platform🌍
 
-Wanderlust is a full-stack web application inspired by Airbnb where users can explore listings, create their own listings, and share reviews.
+property-listing-platform is a full-stack web application inspired by Airbnb where users can explore listings, create their own listings, and share reviews.
 The project is built using **Node.js, Express, MongoDB, and EJS** following the **MVC architecture**.
 
 ---
@@ -111,11 +111,11 @@ MajorProject
 
 Clone the repository:
 
-git clone https://github.com/DevSaurabhY/wanderlust.git
+git clone https://github.com/DevSaurabhY/property-listing-platform.git
 
 Navigate into the project:
 
-cd wanderlust
+cd property-listing-platform
 
 Install dependencies:
 
